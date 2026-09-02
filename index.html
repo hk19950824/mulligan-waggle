@@ -149,6 +149,68 @@
   .product-detail-features{padding:10px 0;margin-bottom:14px}
   .detail-add{padding:12px}
 }
+
+/* ===== Mobile: keep the same visual proportions as desktop ===== */
+@media (max-width:680px){
+  /* Product cards: do not let images become taller than the desktop proportion */
+  .product-img{
+    width:100%;
+    aspect-ratio:1.22;
+    max-height:none;
+  }
+  .product-img img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+  }
+
+  /* Hero image: keep the image area compact on phones */
+  .hero{
+    height:460px;
+  }
+  .hero-image{
+    background-size:cover;
+  }
+
+  /* About image */
+  .about-photo{
+    height:220px;
+  }
+
+  /* Lookbook image */
+  .lookbook{
+    height:150px;
+  }
+}
+
+@media (max-width:760px){
+  /* Product-detail popup: avoid the oversized 330px image on phones */
+  .product-detail-image,
+  .product-detail-image .detail-gallery,
+  .product-detail-image img{
+    min-height:0;
+    height:250px;
+  }
+
+  .product-detail-image img{
+    width:100%;
+    object-fit:contain;
+    object-position:center;
+    background:#f5f6f4;
+  }
+
+  .detail-gallery{
+    min-height:0;
+    height:250px;
+  }
+
+  .detail-gallery img{
+    min-height:0;
+    height:100%;
+    object-fit:contain;
+  }
+}
+
 </style>
 </head>
 <body>
