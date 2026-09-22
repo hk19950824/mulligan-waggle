@@ -242,3 +242,93 @@
 .products:not(.women-products) .product[data-category^="LOGO POLO"] {
   display: none !important;
 }
+
+/* Header icons alignment */
+.header-actions{
+  display:flex;
+  align-items:center;
+  gap:22px;
+}
+
+.header-actions > button,
+.header-actions > a{
+  width:24px;
+  height:24px;
+  padding:0;
+  margin:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  line-height:1;
+  box-sizing:border-box;
+}
+
+.instagram-link{
+  width:24px;
+  height:24px;
+  padding:0;
+  margin:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:#123f35;
+  text-decoration:none;
+  line-height:1;
+}
+
+.instagram-link svg{
+  width:20px !important;
+  height:20px !important;
+  display:block;
+  fill:none !important;
+  stroke:#123f35 !important;
+  stroke-width:1.5;
+  stroke-linecap:round;
+  stroke-linejoin:round;
+}
+
+.instagram-link svg rect{
+  fill:none !important;
+  stroke:#123f35 !important;
+}
+
+.instagram-link svg circle{
+  fill:none !important;
+  stroke:#123f35 !important;
+}
+
+.instagram-link svg circle:last-child{
+  fill:#123f35 !important;
+  stroke:none !important;
+}
+
+
+.cart-link{
+  width:24px;
+  height:24px;
+  padding:0;
+  margin:0;
+  border:0;
+  background:none;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:#123f35;
+  cursor:pointer;
+}
+
+.cart-link svg{
+  width:20px;
+  height:20px;
+  display:block;
+  fill:none;
+  stroke:currentColor;
+  stroke-width:1.5;
+  stroke-linecap:round;
+  stroke-linejoin:round;
+}
+
+.cart-link svg circle{
+  fill:currentColor;
+  stroke:none;
+}
