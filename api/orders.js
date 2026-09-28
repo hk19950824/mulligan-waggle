@@ -27,7 +27,9 @@ function escapeHtml(value){
 module.exports=async function handler(req,res){
 
   if(req.method!=='POST'){
-    return res.status(405).json({error:'Method Not Allowed'});
+    return res.status(405).json({
+      error:'Method Not Allowed'
+    });
   }
 
   const url=process.env.SUPABASE_URL;
@@ -92,7 +94,10 @@ module.exports=async function handler(req,res){
       {auth:{persistSession:false}}
     );
 
+    // =========================
     // 注文をSupabaseへ保存
+    // =========================
+
     const {error}=await supabase
       .from('orders')
       .insert({
@@ -118,11 +123,14 @@ module.exports=async function handler(req,res){
       });
     }
 
-    // 注文通知メール
+    // =========================
+    // メール設定
+    // =========================
+
     const resendApiKey=process.env.RESEND_API_KEY;
     const notificationTo=process.env.ORDER_NOTIFICATION_TO;
 
-    if(resendApiKey && notificationTo){
+    if(resendApiKey){
 
       const itemHtml=cleanItems.map(item=>`
         <tr>
@@ -144,9 +152,106 @@ module.exports=async function handler(req,res){
         </tr>
       `).join('');
 
-      const emailHtml=`
-        <div style="font-family:Arial,'Noto Sans JP',sans-serif;line-height:1.7;color:#222;">
+      // =========================
+      // お客様向けメール
+      // =========================
+
+      const customerEmailHtml=`
+        <div style="font-family:Arial,'Noto Sans JP',sans-serif;line-height:1.7;color:#222;max-width:800px;margin:auto;">
+
           <h2 style="margin-bottom:4px;">
+            Mulligan Waggle
+          </h2>
+
+          <p>
+            ${escapeHtml(c.name)} 様
+          </p>
+
+          <p>
+            この度はMulligan Waggleをご利用いただき、ありがとうございます。
+          </p>
+
+          <p>
+            以下の内容でご注文を受け付けました。
+          </p>
+
+          <div style="background:#f5f5f5;padding:16px;margin:20px 0;">
+            <strong>注文番号</strong><br>
+            <span style="font-size:20px;">
+              ${escapeHtml(orderNumber)}
+            </span>
+          </div>
+
+          <h3>ご注文内容</h3>
+
+          <table style="border-collapse:collapse;width:100%;">
+            <thead>
+              <tr style="background:#f5f5f5;">
+                <th style="padding:8px;text-align:left;">商品</th>
+                <th style="padding:8px;text-align:left;">カラー</th>
+                <th style="padding:8px;text-align:left;">サイズ</th>
+                <th style="padding:8px;">数量</th>
+                <th style="padding:8px;text-align:right;">価格</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              ${itemHtml}
+            </tbody>
+          </table>
+
+          <div style="margin-top:20px;font-size:20px;">
+            <strong>
+              合計：¥${calculatedTotal.toLocaleString()}
+            </strong>
+          </div>
+
+          <h3 style="margin-top:30px;">
+            お届け先
+          </h3>
+
+          <p>
+            〒${escapeHtml(c.postal)}<br>
+            ${escapeHtml(c.prefecture)}
+            ${escapeHtml(c.address)}
+            ${escapeHtml(c.building || '')}
+          </p>
+
+          ${
+            c.note
+              ? `
+                <h3>備考</h3>
+                <p>${escapeHtml(c.note)}</p>
+              `
+              : ''
+          }
+
+          <p style="margin-top:30px;">
+            ご注文内容を確認のうえ、発送準備を進めてまいります。
+          </p>
+
+          <p>
+            今後ともMulligan Waggleをよろしくお願いいたします。
+          </p>
+
+          <hr style="margin:30px 0;border:none;border-top:1px solid #ddd;">
+
+          <p style="font-size:12px;color:#777;">
+            Mulligan Waggle<br>
+            https://mulliganwaggle.com
+          </p>
+
+        </div>
+      `;
+
+      // =========================
+      // ショップ側向けメール
+      // =========================
+
+      const ownerEmailHtml=`
+        <div style="font-family:Arial,'Noto Sans JP',sans-serif;line-height:1.7;color:#222;">
+
+          <h2>
             Mulligan Waggle 新しい注文
           </h2>
 
@@ -194,6 +299,7 @@ module.exports=async function handler(req,res){
                 <th style="padding:8px;text-align:right;">価格</th>
               </tr>
             </thead>
+
             <tbody>
               ${itemHtml}
             </tbody>
@@ -219,37 +325,105 @@ module.exports=async function handler(req,res){
           <p style="font-size:12px;color:#777;">
             Mulligan Waggle
           </p>
+
         </div>
       `;
 
+      // =========================
+      // あなたへ注文通知
+      // =========================
+
+      if(notificationTo){
+
+        try{
+
+          const ownerResponse=await fetch(
+            'https://api.resend.com/emails',
+            {
+              method:'POST',
+
+              headers:{
+                'Content-Type':'application/json',
+                'Authorization':`Bearer ${resendApiKey}`
+              },
+
+              body:JSON.stringify({
+                from:'Mulligan Waggle <orders@mulliganwaggle.com>',
+
+                to:[notificationTo],
+
+                subject:`【Mulligan Waggle】新しい注文 ${orderNumber}`,
+
+                html:ownerEmailHtml
+              })
+            }
+          );
+
+          const ownerResult=await ownerResponse.json();
+
+          if(!ownerResponse.ok){
+            console.error(
+              'Owner email error:',
+              ownerResult
+            );
+          }
+
+        }catch(ownerError){
+
+          console.error(
+            'Owner email notification error:',
+            ownerError
+          );
+
+        }
+      }
+
+      // =========================
+      // お客様へ注文確認メール
+      // =========================
+
       try{
 
-        const emailResponse=await fetch(
+        const customerResponse=await fetch(
           'https://api.resend.com/emails',
           {
             method:'POST',
+
             headers:{
               'Content-Type':'application/json',
               'Authorization':`Bearer ${resendApiKey}`
             },
+
             body:JSON.stringify({
               from:'Mulligan Waggle <orders@mulliganwaggle.com>',
-              to:[notificationTo],
-              subject:`【Mulligan Waggle】新しい注文 ${orderNumber}`,
-              html:emailHtml
+
+              to:[c.email],
+
+              subject:`【Mulligan Waggle】ご注文ありがとうございます ${orderNumber}`,
+
+              html:customerEmailHtml
             })
           }
         );
 
-        const emailResult=await emailResponse.json();
+        const customerResult=await customerResponse.json();
 
-        if(!emailResponse.ok){
-          console.error('Resend error:',emailResult);
+        if(!customerResponse.ok){
+          console.error(
+            'Customer email error:',
+            customerResult
+          );
         }
 
-      }catch(emailError){
-        console.error('Email notification error:',emailError);
+      }catch(customerError){
+
+        console.error(
+          'Customer email notification error:',
+          customerError
+        );
+
       }
+
     }
 
     // メール送信に失敗しても注文自体は成功扱い
@@ -265,5 +439,7 @@ module.exports=async function handler(req,res){
     return res.status(500).json({
       error:'注文受付中にエラーが発生しました。'
     });
+
   }
+
 };
