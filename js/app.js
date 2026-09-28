@@ -232,6 +232,152 @@ function renderCart(){
  document.getElementById('total').textContent='¥'+total.toLocaleString();
 }
 window.removeItem=i=>{cart.splice(i,1);renderCart()};
-document.getElementById('checkout').onclick=()=>alert('EC決済を接続すると、ここから購入手続きへ進めます。');
-document.querySelectorAll('form').forEach(form=>form.addEventListener('submit',e=>{e.preventDefault();alert('登録ありがとうございます。');form.reset()}));
-document.getElementById('menuBtn').onclick=()=>document.querySelector('.nav').classList.toggle('mobile-open');
+
+/* =========================================================
+   CHECKOUT / PURCHASE FORM / ORDER RECEIVING
+   ========================================================= */
+
+const checkoutModal=document.getElementById('checkoutModal');
+const checkoutBackdrop=document.getElementById('checkoutBackdrop');
+const checkoutClose=document.getElementById('checkoutClose');
+const purchaseForm=document.getElementById('purchaseForm');
+const checkoutItems=document.getElementById('checkoutItems');
+const checkoutTotal=document.getElementById('checkoutTotal');
+const purchaseComplete=document.getElementById('purchaseComplete');
+const purchaseCompleteClose=document.getElementById('purchaseCompleteClose');
+const orderNumber=document.getElementById('orderNumber');
+const purchaseCompleteMessage=document.getElementById('purchaseCompleteMessage');
+
+function formatYen(value){
+  return '¥'+Number(value||0).toLocaleString('ja-JP');
+}
+
+function escapeHtml(value){
+  return String(value ?? '').replace(/[&<>"']/g,char=>({
+    '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'
+  }[char]));
+}
+
+function renderCheckoutSummary(){
+  const total=cart.reduce((sum,item)=>sum+Number(item.price),0);
+  checkoutItems.innerHTML=cart.length
+    ? cart.map(item=>`
+      <div class="checkout-item">
+        <div>
+          <span class="checkout-item-name">${escapeHtml(item.name)} × 1</span>
+          <span class="checkout-item-meta">${escapeHtml(item.color||'-')} / SIZE ${escapeHtml(item.size||'M')}</span>
+        </div>
+        <span class="checkout-item-price">${formatYen(item.price)}</span>
+      </div>
+    `).join('')
+    : '<p class="empty">カートに商品がありません。</p>';
+  checkoutTotal.textContent=formatYen(total);
+}
+
+function openCheckout(){
+  if(!cart.length){
+    alert('カートに商品を追加してください。');
+    return;
+  }
+  renderCheckoutSummary();
+  purchaseForm.hidden=false;
+  purchaseComplete.hidden=true;
+  checkoutModal.classList.add('is-open');
+  checkoutModal.setAttribute('aria-hidden','false');
+  document.body.style.overflow='hidden';
+}
+
+function closeCheckout(){
+  checkoutModal.classList.remove('is-open');
+  checkoutModal.setAttribute('aria-hidden','true');
+  document.body.style.overflow='';
+}
+
+document.getElementById('checkout').onclick=openCheckout;
+checkoutBackdrop.onclick=closeCheckout;
+checkoutClose.onclick=closeCheckout;
+purchaseCompleteClose.onclick=closeCheckout;
+
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape' && checkoutModal.classList.contains('is-open')) closeCheckout();
+});
+
+purchaseForm.addEventListener('submit',async e=>{
+  e.preventDefault();
+
+  if(!cart.length){
+    alert('カートに商品を追加してください。');
+    return;
+  }
+
+  const button=purchaseForm.querySelector('.purchase-submit');
+  const fd=new FormData(purchaseForm);
+
+  const payload={
+    customer:{
+      name:String(fd.get('name')||'').trim(),
+      email:String(fd.get('email')||'').trim(),
+      tel:String(fd.get('tel')||'').trim(),
+      postal:String(fd.get('postal')||'').trim(),
+      prefecture:String(fd.get('prefecture')||'').trim(),
+      address:String(fd.get('address')||'').trim(),
+      building:String(fd.get('building')||'').trim(),
+      note:String(fd.get('note')||'').trim()
+    },
+    items:cart.map(item=>({
+      name:item.name,
+      price:Number(item.price),
+      color:item.color||'',
+      size:item.size||'M',
+      quantity:1
+    })),
+    total:cart.reduce((sum,item)=>sum+Number(item.price),0)
+  };
+
+  button.disabled=true;
+  button.textContent='注文を受付中…';
+
+  try{
+    const response=await fetch('/api/orders',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify(payload)
+    });
+
+    const result=await response.json().catch(()=>({}));
+
+    if(!response.ok){
+      throw new Error(result.error||'注文を受け付けられませんでした。');
+    }
+
+    orderNumber.textContent=result.orderNumber;
+    purchaseCompleteMessage.textContent='ご注文ありがとうございます。ご注文を正常に受け付けました。';
+
+    purchaseForm.hidden=true;
+    purchaseComplete.hidden=false;
+
+    cart.length=0;
+    renderCart();
+
+  }catch(error){
+    console.error(error);
+    alert(error.message||'注文受付中にエラーが発生しました。');
+  }finally{
+    button.disabled=false;
+    button.textContent='注文内容を確認する →';
+  }
+});
+
+/* メルマガ */
+document.querySelectorAll('#newsletter,#footerNewsletter').forEach(form=>{
+  form.addEventListener('submit',e=>{
+    e.preventDefault();
+    alert('登録ありがとうございます。');
+    form.reset();
+  });
+});
+
+/* スマホメニュー */
+document.getElementById('menuBtn').onclick=()=>{
+  document.querySelector('.nav').classList.toggle('mobile-open');
+};

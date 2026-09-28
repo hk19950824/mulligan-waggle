@@ -231,6 +231,115 @@
 <div class="cart-total"><span>合計</span><strong id="total">¥0</strong></div>
 <button class="checkout" id="checkout">CHECKOUT →</button>
 </aside>
+
+<!-- ================= CHECKOUT FORM ================= -->
+<div class="checkout-modal" id="checkoutModal" aria-hidden="true">
+  <div class="checkout-backdrop" id="checkoutBackdrop"></div>
+  <div class="checkout-panel" role="dialog" aria-modal="true" aria-labelledby="checkoutTitle">
+    <button class="checkout-close" id="checkoutClose" type="button" aria-label="閉じる">×</button>
+
+    <div class="checkout-heading">
+      <p class="eyebrow">ORDER / CHECKOUT</p>
+      <h2 id="checkoutTitle">購入フォーム</h2>
+      <p>ご注文内容とお客様情報をご入力ください。</p>
+    </div>
+
+    <div class="checkout-layout">
+      <section class="checkout-summary">
+        <h3>ORDER SUMMARY</h3>
+        <div id="checkoutItems" class="checkout-items"></div>
+        <div class="checkout-summary-total">
+          <span>商品合計</span>
+          <strong id="checkoutTotal">¥0</strong>
+        </div>
+        <p class="checkout-note">※ 現在は受注生産の購入申込みフォームです。決済機能は別途接続できます。</p>
+      </section>
+
+      <form id="purchaseForm" class="purchase-form">
+        <h3>CUSTOMER INFORMATION</h3>
+
+        <div class="form-row">
+          <label>
+            <span>お名前 <b>*</b></span>
+            <input name="name" type="text" autocomplete="name" required placeholder="例：山田 太郎">
+          </label>
+          <label>
+            <span>メールアドレス <b>*</b></span>
+            <input name="email" type="email" autocomplete="email" required placeholder="example@email.com">
+          </label>
+        </div>
+
+        <div class="form-row">
+          <label>
+            <span>電話番号 <b>*</b></span>
+            <input name="tel" type="tel" autocomplete="tel" required placeholder="090-1234-5678">
+          </label>
+          <label>
+            <span>郵便番号 <b>*</b></span>
+            <input name="postal" type="text" inputmode="numeric" autocomplete="postal-code" required placeholder="123-4567">
+          </label>
+        </div>
+
+        <div class="form-row">
+          <label>
+            <span>都道府県 <b>*</b></span>
+            <select name="prefecture" autocomplete="address-level1" required>
+              <option value="">選択してください</option>
+              <option>北海道</option><option>青森県</option><option>岩手県</option><option>宮城県</option>
+              <option>秋田県</option><option>山形県</option><option>福島県</option><option>茨城県</option>
+              <option>栃木県</option><option>群馬県</option><option>埼玉県</option><option>千葉県</option>
+              <option>東京都</option><option>神奈川県</option><option>新潟県</option><option>富山県</option>
+              <option>石川県</option><option>福井県</option><option>山梨県</option><option>長野県</option>
+              <option>岐阜県</option><option>静岡県</option><option>愛知県</option><option>三重県</option>
+              <option>滋賀県</option><option>京都府</option><option>大阪府</option><option>兵庫県</option>
+              <option>奈良県</option><option>和歌山県</option><option>鳥取県</option><option>島根県</option>
+              <option>岡山県</option><option>広島県</option><option>山口県</option><option>徳島県</option>
+              <option>香川県</option><option>愛媛県</option><option>高知県</option><option>福岡県</option>
+              <option>佐賀県</option><option>長崎県</option><option>熊本県</option><option>大分県</option>
+              <option>宮崎県</option><option>鹿児島県</option><option>沖縄県</option>
+            </select>
+          </label>
+          <label>
+            <span>市区町村・番地 <b>*</b></span>
+            <input name="address" type="text" autocomplete="street-address" required placeholder="渋谷区〇〇1-2-3">
+          </label>
+        </div>
+
+        <label>
+          <span>建物名・部屋番号</span>
+          <input name="building" type="text" autocomplete="address-line2" placeholder="〇〇マンション101号室">
+        </label>
+
+        <label>
+          <span>備考</span>
+          <textarea name="note" rows="4" placeholder="配送についてのご希望など"></textarea>
+        </label>
+
+        <div class="purchase-agreement">
+          <label class="check-label">
+            <input name="agreement" type="checkbox" required>
+            <span>注文内容・利用規約・プライバシーポリシーを確認しました。</span>
+          </label>
+        </div>
+
+        <button class="purchase-submit" type="submit">注文内容を確認する →</button>
+      </form>
+    </div>
+
+    <div class="purchase-complete" id="purchaseComplete" hidden>
+      <p class="eyebrow">ORDER RECEIVED</p>
+      <h2>ご注文を受け付けました。</h2>
+      <p id="purchaseCompleteMessage">ご注文ありがとうございます。</p>
+      <div class="order-number-box">
+        <span>ORDER NUMBER</span>
+        <strong id="orderNumber">MW-00000000-000</strong>
+      </div>
+      <p class="order-receipt-note">ご注文内容をショップ側で確認できる状態になりました。</p>
+      <button type="button" class="outline-btn" id="purchaseCompleteClose">閉じる</button>
+    </div>
+  </div>
+</div>
+
 <div class="overlay" id="overlay"></div>
 <div class="toast" id="toast">カートに追加しました。</div>
 <!-- ================= JAVASCRIPT START =================

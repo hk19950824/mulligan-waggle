@@ -332,3 +332,113 @@
   fill:currentColor;
   stroke:none;
 }
+
+/* =========================================================
+   CHECKOUT / PURCHASE FORM
+   ========================================================= */
+.checkout-modal{
+  position:fixed;inset:0;z-index:10000;display:none;
+}
+.checkout-modal.is-open{display:block}
+.checkout-backdrop{
+  position:absolute;inset:0;background:rgba(15,22,18,.72);
+  backdrop-filter:blur(5px);
+}
+.checkout-panel{
+  position:relative;width:min(1080px,92vw);max-height:92vh;overflow:auto;
+  margin:4vh auto 0;background:#fff;color:#14221e;padding:42px;
+  box-shadow:0 25px 80px rgba(0,0,0,.28);
+}
+.checkout-close{
+  position:absolute;top:14px;right:18px;border:0;background:none;
+  font-size:34px;line-height:1;cursor:pointer;color:#14221e;
+}
+.checkout-heading{
+  margin-bottom:30px;border-bottom:1px solid #dfe4e0;padding-bottom:24px;
+}
+.checkout-heading h2{
+  margin:4px 0 8px;font-family:"Cormorant Garamond",Georgia,serif;
+  font-size:42px;font-weight:600;
+}
+.checkout-heading p:last-child{margin:0;color:#69736d}
+.checkout-layout{
+  display:grid;grid-template-columns:minmax(280px,.8fr) minmax(420px,1.2fr);
+  gap:42px;
+}
+.checkout-summary h3,.purchase-form h3{
+  font-size:12px;letter-spacing:.16em;margin:0 0 18px;
+}
+.checkout-items{border-top:1px solid #dfe4e0}
+.checkout-item{
+  display:flex;justify-content:space-between;gap:18px;padding:16px 0;
+  border-bottom:1px solid #dfe4e0;font-size:14px;
+}
+.checkout-item-name{font-weight:600}
+.checkout-item-meta{
+  display:block;margin-top:5px;color:#737d77;font-size:12px;
+}
+.checkout-item-price{white-space:nowrap}
+.checkout-summary-total{
+  display:flex;justify-content:space-between;padding-top:20px;font-size:15px;
+}
+.checkout-summary-total strong{font-size:20px}
+.checkout-note{
+  margin-top:24px;padding:14px;background:#f5f7f5;color:#69736d;
+  font-size:12px;line-height:1.7;
+}
+.purchase-form label{display:block;margin-bottom:17px}
+.purchase-form label>span{
+  display:block;margin-bottom:7px;font-size:12px;font-weight:600;letter-spacing:.04em;
+}
+.purchase-form label b{color:#54755f}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.purchase-form input,.purchase-form select,.purchase-form textarea{
+  box-sizing:border-box;width:100%;border:1px solid #cfd6d1;background:#fff;
+  padding:13px 14px;font:inherit;color:#14221e;outline:none;border-radius:0;
+}
+.purchase-form textarea{resize:vertical;min-height:100px}
+.purchase-form input:focus,.purchase-form select:focus,.purchase-form textarea:focus{
+  border-color:#315d43;box-shadow:0 0 0 2px rgba(49,93,67,.08);
+}
+.purchase-agreement{margin:20px 0}
+.check-label{display:flex!important;gap:9px;align-items:flex-start}
+.check-label input{width:auto!important;margin-top:3px}
+.check-label span{
+  margin:0!important;font-weight:400!important;letter-spacing:0!important;line-height:1.6;
+}
+.purchase-submit{
+  width:100%;border:0;background:#0b6b57;color:#fff;padding:17px 20px;
+  font:600 12px "Noto Sans JP",sans-serif;letter-spacing:.14em;cursor:pointer;
+}
+.purchase-submit:hover{background:#083e33}
+.purchase-complete{text-align:center;padding:50px 20px}
+.purchase-complete h2{
+  font-family:"Cormorant Garamond",Georgia,serif;font-size:40px;margin:8px 0 15px;
+}
+.purchase-complete p{
+  max-width:600px;margin:0 auto 28px;line-height:1.9;color:#69736d;
+}
+@media(max-width:760px){
+  .checkout-panel{
+    width:100%;max-height:100vh;margin:0;padding:30px 20px 35px;box-sizing:border-box;
+  }
+  .checkout-heading h2{font-size:34px}
+  .checkout-layout{grid-template-columns:1fr;gap:30px}
+  .form-row{grid-template-columns:1fr;gap:0}
+}
+
+/* ===== ORDER RECEIVED ===== */
+.order-number-box{
+  max-width:360px;margin:28px auto;padding:18px 20px;
+  border:1px solid #dfe4e0;background:#f7f9f7;text-align:center;
+}
+.order-number-box span{
+  display:block;font-size:9px;letter-spacing:2px;color:#6b756f;margin-bottom:7px;
+}
+.order-number-box strong{
+  display:block;font-family:"Cormorant Garamond",Georgia,serif;
+  font-size:25px;letter-spacing:1.5px;color:#0b6b57;
+}
+.order-receipt-note{
+  font-size:11px!important;line-height:1.8!important;color:#737d77!important;
+}
